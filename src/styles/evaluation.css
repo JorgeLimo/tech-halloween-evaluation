@@ -156,25 +156,24 @@
 
 /* Frase que el personaje le dedica al estudiante */
 .evaluation__tagline {
-  max-width: 17ch;
+  max-width: min(100%, 420px);
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(0.74rem, 1.05vw, 0.95rem);
+  font-size: clamp(1rem, 1.6vw, 1.42rem);
   font-weight: 700;
-  line-height: 1.45;
-  letter-spacing: 0.22em;
+  line-height: 1.22;
+  letter-spacing: 0.2em;
   text-align: center;
   text-transform: uppercase;
-  color: var(--bone-dim);
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.75);
+  color: var(--bone);
+  text-shadow:
+    0 2px 18px rgba(0, 0, 0, 0.8),
+    0 0 36px rgba(212, 27, 42, 0.25);
 }
 
-/* En pantallas anchas cabe en una sola línea, que es como mejor se lee. */
-@media (min-width: 1100px) {
-  .evaluation__tagline {
-    max-width: none;
-    white-space: nowrap;
-  }
+/* Dos líneas fijas: la frase siempre se lee igual. */
+.evaluation__tagline-line {
+  display: block;
 }
 
 .evaluation__tagline-dash {
@@ -340,5 +339,17 @@
 
   .progress {
     margin-top: 0.25rem;
+  }
+
+  .evaluation {
+    padding-bottom: 0.9rem;
+  }
+
+  .evaluation__bar {
+    padding-bottom: 0.5rem;
+  }
+
+  .evaluation__aside {
+    gap: 0.5rem;
   }
 }

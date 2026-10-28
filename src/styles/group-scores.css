@@ -1,0 +1,89 @@
+/* ==========================================================================
+   Puntaje de los grupos (dentro de la revisión de la respuesta)
+   ========================================================================== */
+
+.group-scores {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.6rem, 1.4vw, 1rem);
+  padding-top: clamp(0.8rem, 1.6vw, 1.2rem);
+  border-top: 1px solid var(--ink-600);
+}
+
+.group-scores__title {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--blood-bright);
+}
+
+.group-scores__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: clamp(0.5rem, 1.2vw, 0.9rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.group-score {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius-sm);
+  background: rgba(12, 12, 18, 0.8);
+}
+
+.group-score__label {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: clamp(0.82rem, 1.3vw, 1rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+  white-space: nowrap;
+}
+
+.group-score__input {
+  width: 2.6em;
+  padding: 0.25em 0;
+  font-family: var(--font-mono);
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  text-align: center;
+  color: #fff;
+  border: 1px solid var(--ink-500, var(--ink-600));
+  border-radius: var(--radius-sm);
+  background: rgba(4, 4, 7, 0.9);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.group-score__input:focus {
+  outline: none;
+  border-color: var(--blood-bright);
+  box-shadow: 0 0 20px rgba(212, 27, 42, 0.35);
+}
+
+.group-score__max {
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 1.2vw, 0.9rem);
+  color: var(--ash-dim);
+  white-space: nowrap;
+}
+
+.group-scores__hint {
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 1.2vw, 0.88rem);
+  letter-spacing: 0.12em;
+  color: var(--ash-dim);
+}
+
+.group-scores__hint.is-invalid {
+  color: var(--blood-bright);
+}

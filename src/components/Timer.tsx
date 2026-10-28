@@ -14,10 +14,10 @@ const RADIUS = 86;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const PHASE_LABEL: Record<TimerPhase, string> = {
-  normal: 'Time remaining',
-  warning: 'Running low',
-  critical: 'Critical time',
-  final: 'Final seconds',
+  normal: 'Tiempo restante',
+  warning: 'Queda poco tiempo',
+  critical: 'Tiempo crítico',
+  final: 'Últimos segundos',
 };
 
 export function Timer({ remaining, duration, phase, running }: TimerProps) {
@@ -58,7 +58,7 @@ export function Timer({ remaining, duration, phase, running }: TimerProps) {
         </motion.div>
       </div>
 
-      <p className="timer__label">{running ? PHASE_LABEL[phase] : 'Timer stopped'}</p>
+      <p className="timer__label">{running ? PHASE_LABEL[phase] : 'Cuenta detenida'}</p>
     </div>
   );
 }

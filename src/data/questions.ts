@@ -9,7 +9,7 @@
  *  - id            : identificador único (además reinicia el contador).
  *  - text          : enunciado de la pregunta.
  *  - points        : puntos que vale la pregunta.
- *  - correctAnswer : respuesta correcta, visible solo al pulsar «Reveal answer».
+ *  - correctAnswer : respuesta correcta, visible solo al pulsar «Ver respuesta».
  *  - explanation   : (opcional) por qué esa es la respuesta correcta.
  *  - group         : (opcional) grupo al que le corresponde responder.
  *  - category      : (opcional) etiqueta temática sobre el enunciado.

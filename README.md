@@ -3,10 +3,11 @@
 Aplicación web para tomar una evaluación a **6 grupos de estudiantes** de
 forma simultánea, con estética oscura inspirada en el cine de terror: una
 pregunta a la vez, un contador de **10 minutos**, la respuesta correcta con su
-explicación —que solo aparece cuando se pide— y un muñeco animado que observa,
-gira la cabeza y cambia de expresión.
+explicación —que solo aparece cuando se pide—, el puntaje de cada grupo
+capturado a mano y un muñeco animado que observa, gira la cabeza y cambia de
+expresión.
 
-**5 preguntas × 4 puntos = 20 puntos.**
+**5 preguntas × 4 puntos = 20 puntos por grupo · 6 grupos.**
 
 Hecha con **React + TypeScript + Vite + Framer Motion**. Sin backend: funciona
 por completo en el navegador.
@@ -48,7 +49,7 @@ export const questions: Question[] = [
     id: 1,
     points: 4,                         // puntos que vale la pregunta
     text: '¿Qué dispositivo permite interconectar diferentes redes?',
-    correctAnswer: 'El router',        // visible solo al pulsar «Reveal answer»
+    correctAnswer: 'El router',        // visible solo al pulsar «Ver respuesta»
     explanation: 'El router trabaja en la capa de red...',   // opcional
     // category: 'Redes',              // opcional: etiqueta sobre el enunciado
     // group: 1,                       // opcional: grupo que responde
@@ -71,53 +72,75 @@ ningún componente.
 ## Flujo
 
 ```
-START → QUESTION 01 (10:00) → FINISH QUESTION (o 00:00)
+INICIAR EVALUACIÓN → PREGUNTA 01 DE 05 (10:00)
                                       ↓
-                                 TIME'S UP!
+                    FINALIZAR PREGUNTA (o 00:00)
                                       ↓
-                             [ REVEAL ANSWER ]
+                            ¡SE ACABÓ EL TIEMPO!
                                       ↓
-                        CORRECT ANSWER + EXPLANATION
+                            [ VER RESPUESTA ]
                                       ↓
-                            [ NEXT QUESTION ]
+                    RESPUESTA CORRECTA + EXPLICACIÓN
+                                      ↓
+                        PUNTAJE DE LOS GRUPOS (0-4)
+                                      ↓
+                          [ SIGUIENTE PREGUNTA ]
                                       ↓
                                    ... × 5
                                       ↓
-                             [ SEE RESULTS ]
+                            [ VER RESULTADOS ]
                                       ↓
-                      EVALUATION FINISHED — XX / 20
+                 EVALUACIÓN TERMINADA — 6 grupos, XX / 20
 ```
 
-- El contador **solo arranca** al presionar «Start evaluation».
+- El contador **solo arranca** al presionar «Iniciar evaluación».
 - Se reinicia a `10:00` en cada pregunta nueva, junto con los estados de alerta.
 - Estados del contador: normal (> 2 min) → advertencia (2–1 min) → crítico
   (< 1 min) → alerta intensa con parpadeo (últimos 10 s).
-- La pregunta termina de dos maneras: al pulsar **«Finish question»** o cuando
-  el contador llega a `00:00`. En ambos casos el contador se detiene y aparece
-  la pantalla **TIME'S UP!**, que **no revela nada**.
+- La pregunta termina de dos maneras: al pulsar **«Finalizar pregunta»** o
+  cuando el contador llega a `00:00`. En ambos casos el contador se detiene y
+  aparece la pantalla **¡SE ACABÓ EL TIEMPO!**, que **no revela nada**.
 - La respuesta correcta y la explicación aparecen únicamente al pulsar
-  **«Reveal answer»**: nunca de forma automática.
-- Desde la revisión, **«Next question»** (o **«See results»** en la última) es
-  el único botón que avanza.
+  **«Ver respuesta»**: nunca de forma automática.
+- Desde la revisión, **«Siguiente pregunta»** (o **«Ver resultados»** en la
+  última) es el único botón que avanza, y al pulsarlo guarda el puntaje de los
+  seis grupos.
+- La interfaz está en español. Solo se mantienen en inglés las dos frases
+  temáticas: **WANNA PLAY A GAME?** y **PASS OR FAIL — YOU CHOOSE.**
 - No se puede volver a una pregunta anterior (el estado es un índice simple en
   `App.tsx`, así que agregar un botón «Anterior» es trivial si se necesita).
 
-### Puntaje
+### Puntaje de los seis grupos
 
-En la pantalla de revisión hay dos botones, **Correct · +4** y
-**Wrong · 0**, para que quien dirige la evaluación califique la respuesta
-del grupo. Lo marcado se suma y se muestra al final como `XX / 20`. Si no se
-marca nada, la pregunta cuenta 0.
+Debajo de la explicación aparece **Puntaje de los grupos**: un campo por grupo
+donde el docente escribe los puntos obtenidos en esa pregunta. No hay botones
+de «correcta» o «incorrecta», porque una respuesta puede valer un puntaje
+parcial.
 
-Toda la lógica vive en `App.tsx` (`scores`, `award`), así que sustituirla por
-otra forma de evaluar —autoevaluación, respuesta escrita, varios grupos a la
-vez— es un cambio acotado a ese archivo.
+- Cada campo acepta solo enteros entre `0` y los puntos de la pregunta (4).
+  Un valor fuera de rango se rechaza y aparece «Ingrese un valor entre 0 y 4.».
+- Un campo vacío cuenta como 0.
+- Al pulsar «Siguiente pregunta» se guardan los seis valores.
+
+El estado vive en `src/data/scores.ts`:
+
+```ts
+interface GroupScore {
+  groupId: number;  // 1 … 6
+  scores: number[]; // un puntaje por pregunta
+  total: number;    // se recalcula solo, nunca se escribe a mano
+}
+```
+
+`App.tsx` guarda el arreglo de `GroupScore` y lo actualiza con
+`withQuestionScores(grupos, indicePregunta, puntos)`. La cantidad de grupos
+sale de `TOTAL_GROUPS` en `src/data/questions.ts`.
 
 ### Atajos de teclado (útiles al proyectar en clase)
 
 | Tecla                 | Acción                      |
 | --------------------- | --------------------------- |
-| `→` / `Espacio` / `↵` | Continuar (ver respuesta / siguiente) |
+| `→` / `Espacio` / `↵` | Continuar (no actúa al escribir un puntaje) |
 | `P`                   | Pausar / reanudar           |
 | `M`                   | Silenciar / activar sonido  |
 
@@ -134,14 +157,16 @@ src/
 │   ├── SawCharacter.tsx      muñeco (SVG por capas) con expresiones
 │   ├── QuestionCard.tsx      tarjeta del enunciado
 │   ├── Timer.tsx             contador MM:SS con anillo de progreso
-│   ├── AnswerReveal.tsx      respuesta correcta, explicación y calificación
-│   ├── GameOver.tsx          cartel de tiempo agotado (encabeza la revisión)
-│   └── ResultScreen.tsx      cierre con el puntaje final
+│   ├── AnswerReveal.tsx      respuesta correcta, explicación y puntajes
+│   ├── GroupScores.tsx       un campo 0-4 por grupo, con validación
+│   ├── GameOver.tsx          pantalla «¡Se acabó el tiempo!»
+│   └── ResultScreen.tsx      tabla final de los seis grupos
 ├── hooks/
 │   ├── useCountdown.ts       cuenta regresiva (un solo intervalo, con limpieza)
 │   └── usePuppet.ts          giro de cabeza + expresión aleatoria
 ├── data/
-│   └── questions.ts          ← aquí se editan las preguntas
+│   ├── questions.ts          ← aquí se editan las preguntas
+│   └── scores.ts             puntaje por grupo (el total se calcula solo)
 ├── audio/
 │   └── sounds.ts             gestor de sonido (archivos opcionales)
 ├── assets/

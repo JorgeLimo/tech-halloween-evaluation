@@ -10,31 +10,18 @@ interface GameOverProps {
   clock: string;
 }
 
-const MESSAGES = [
-  'Your time is over. The choice is no longer yours.',
-  'The clock does not negotiate. Your chance is spent.',
-  'Zero. Silence is an answer too.',
-  'Your time is over. Live or die: the next one is waiting.',
-  'The game is over for this question.',
-];
-
-const EARLY_MESSAGES = [
-  'You closed the question. The clock is stopped.',
-  'You decided to stop. There is no going back.',
-  'Question closed. The clock will not run again.',
-];
+const TIMEOUT_MESSAGE = 'El tiempo para esta pregunta ha terminado.';
+const EARLY_MESSAGE = 'La pregunta se cerró antes de tiempo. El contador está detenido.';
 
 /**
  * Pantalla de tiempo agotado.
  *
  * Es la etapa intermedia entre la pregunta y la respuesta: anuncia que el
  * tiempo terminó, pero no revela nada. La respuesta solo aparece cuando se
- * pulsa «Reveal answer».
+ * pulsa «Ver respuesta».
  */
 export function GameOver({ questionNumber, timedOut, clock }: GameOverProps) {
-  const message = timedOut
-    ? MESSAGES[(questionNumber - 1) % MESSAGES.length]
-    : EARLY_MESSAGES[(questionNumber - 1) % EARLY_MESSAGES.length];
+  const message = timedOut ? TIMEOUT_MESSAGE : EARLY_MESSAGE;
 
   return (
     <motion.div
@@ -58,13 +45,13 @@ export function GameOver({ questionNumber, timedOut, clock }: GameOverProps) {
         animate={{ letterSpacing: '0.14em', opacity: 1 }}
         transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
       >
-        Time&rsquo;s up!
+        ¡Se acabó el tiempo!
       </motion.h2>
 
       <p className="game-over__message">{message}</p>
 
       <p className="game-over__hint">
-        Question {String(questionNumber).padStart(2, '0')} · the answer is still hidden
+        Pregunta {String(questionNumber).padStart(2, '0')} · la respuesta sigue oculta
       </p>
     </motion.div>
   );

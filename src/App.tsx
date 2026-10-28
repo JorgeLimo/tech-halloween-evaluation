@@ -4,25 +4,26 @@ import { EvaluationScreen } from './components/EvaluationScreen';
 import { ResultScreen } from './components/ResultScreen';
 import { StartScreen } from './components/StartScreen';
 import { DEFAULT_TIME_LIMIT, MAX_SCORE, questions } from './data/questions';
+import { createGroupScores, withQuestionScores } from './data/scores';
 import { playSound, stopAllSounds } from './audio/sounds';
 
 type Phase = 'start' | 'running' | 'result';
 
 const transition: Transition = { duration: 0.6, ease: [0.16, 1, 0.3, 1] };
 
-/** Puntaje inicial: cero puntos en cada pregunta. */
-const emptyScores = () => questions.map(() => 0);
+/** Puntaje inicial: los seis grupos en cero. */
+const emptyScores = () => createGroupScores(questions.length);
 
 export default function App() {
   const [phase, setPhase] = useState<Phase>('start');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [expiredCount, setExpiredCount] = useState(0);
-  const [scores, setScores] = useState<number[]>(emptyScores);
+  const [groupScores, setGroupScores] = useState(emptyScores);
 
   const start = useCallback(() => {
     setCurrentIndex(0);
     setExpiredCount(0);
-    setScores(emptyScores());
+    setGroupScores(emptyScores());
     playSound('start');
     setPhase('running');
   }, []);
@@ -39,7 +40,7 @@ export default function App() {
     stopAllSounds();
     setCurrentIndex(0);
     setExpiredCount(0);
-    setScores(emptyScores());
+    setGroupScores(emptyScores());
     setPhase('start');
   }, []);
 
@@ -47,15 +48,10 @@ export default function App() {
     setExpiredCount((count) => count + 1);
   }, []);
 
-  const award = useCallback((index: number, points: number) => {
-    setScores((current) => {
-      const next = [...current];
-      next[index] = points;
-      return next;
-    });
+  /** Guarda los puntos de los seis grupos en una pregunta. */
+  const registerScores = useCallback((index: number, points: number[]) => {
+    setGroupScores((current) => withQuestionScores(current, index, points));
   }, []);
-
-  const score = scores.reduce((total, points) => total + points, 0);
 
   return (
     <AnimatePresence mode="wait">
@@ -83,13 +79,13 @@ export default function App() {
             onAdvance={advance}
             onFinish={finish}
             onExpired={registerExpired}
-            onAward={award}
+            onRegisterScores={registerScores}
           />
         )}
 
         {phase === 'result' && (
           <ResultScreen
-            score={score}
+            groupScores={groupScores}
             maxScore={MAX_SCORE}
             totalQuestions={questions.length}
             pointsPerQuestion={questions[0]?.points ?? 0}

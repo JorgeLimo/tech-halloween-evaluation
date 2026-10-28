@@ -8,7 +8,7 @@ import { SawCharacter } from './SawCharacter';
 import { Timer } from './Timer';
 import { usePuppet } from '../hooks/usePuppet';
 import { formatTime, getTimerPhase, useCountdown } from '../hooks/useCountdown';
-import { DEFAULT_TIME_LIMIT, type Question } from '../data/questions';
+import { DEFAULT_TIME_LIMIT, TOTAL_GROUPS, type Question } from '../data/questions';
 import { isMuted, playSound, setMuted, stopAllSounds } from '../audio/sounds';
 import '../styles/evaluation.css';
 
@@ -21,8 +21,8 @@ interface EvaluationScreenProps {
   onFinish: () => void;
   /** Informa que una pregunta se quedó sin tiempo. */
   onExpired: () => void;
-  /** Registra los puntos obtenidos en la pregunta actual. */
-  onAward: (index: number, points: number) => void;
+  /** Registra los puntos de cada grupo en la pregunta actual. */
+  onRegisterScores: (index: number, points: number[]) => void;
 }
 
 /**
@@ -41,7 +41,7 @@ export function EvaluationScreen({
   onAdvance,
   onFinish,
   onExpired,
-  onAward,
+  onRegisterScores,
 }: EvaluationScreenProps) {
   const question = questions[currentIndex];
   const total = questions.length;
@@ -50,7 +50,7 @@ export function EvaluationScreen({
 
   const [stage, setStage] = useState<Stage>('question');
   const [timedOut, setTimedOut] = useState(false);
-  const [awarded, setAwarded] = useState<number | null>(null);
+  const [points, setPoints] = useState<number[]>(() => Array<number>(TOTAL_GROUPS).fill(0));
   const [paused, setPaused] = useState(false);
   const [muted, setMutedState] = useState(() => isMuted());
 
@@ -88,7 +88,7 @@ export function EvaluationScreen({
   useEffect(() => {
     setStage('question');
     setTimedOut(false);
-    setAwarded(null);
+    setPoints(Array<number>(TOTAL_GROUPS).fill(0));
     setPaused(false);
     setExpression('normal');
   }, [question.id, setExpression]);
@@ -114,10 +114,10 @@ export function EvaluationScreen({
   const primaryAction =
     stage === 'question' ? finishQuestion : stage === 'timesUp' ? revealAnswer : undefined;
 
-  /** Desde la revisión: guarda el puntaje y avanza. */
+  /** Desde la revisión: guarda el puntaje de los grupos y avanza. */
   const goNext = useCallback(() => {
     stopAllSounds();
-    onAward(currentIndex, awarded ?? 0);
+    onRegisterScores(currentIndex, points);
 
     if (isLastQuestion) {
       playSound('finish');
@@ -126,7 +126,12 @@ export function EvaluationScreen({
     }
     playSound('next');
     onAdvance();
-  }, [awarded, currentIndex, isLastQuestion, onAdvance, onAward, onFinish]);
+  }, [currentIndex, isLastQuestion, onAdvance, onFinish, onRegisterScores, points]);
+
+  /** Puntos de un grupo en la pregunta actual. */
+  const setGroupPoints = useCallback((groupIndex: number, value: number) => {
+    setPoints((current) => current.map((item, index) => (index === groupIndex ? value : item)));
+  }, []);
 
   const toggleMuted = useCallback(() => {
     setMutedState((current) => {
@@ -165,11 +170,11 @@ export function EvaluationScreen({
       <header className="evaluation__bar">
         <div className="evaluation__brand">
           <span className="evaluation__brand-mark" aria-hidden="true">✕</span>
-          <span className="evaluation__brand-text">Evaluation · Information Technology</span>
+          <span className="evaluation__brand-text">Evaluación · Tecnología de Información</span>
         </div>
 
         <p className="evaluation__position">
-          Question <strong>{currentIndex + 1}</strong> of {total}
+          Pregunta <strong>{currentIndex + 1}</strong> de {total}
         </p>
 
         <div className="evaluation__controls">
@@ -179,7 +184,7 @@ export function EvaluationScreen({
             onClick={() => setPaused((value) => !value)}
             disabled={stage !== 'question'}
             aria-pressed={paused}
-            title="Pause / resume (P)"
+            title="Pausar / reanudar (P)"
           >
             {paused ? '▶' : '❚❚'}
           </button>
@@ -188,14 +193,14 @@ export function EvaluationScreen({
             className="icon-btn"
             onClick={toggleMuted}
             aria-pressed={muted}
-            title="Mute / unmute (M)"
+            title="Silenciar / activar sonido (M)"
           >
             {muted ? '🔇' : '🔊'}
           </button>
         </div>
       </header>
 
-      <ol className="progress" aria-label={`Question ${currentIndex + 1} of ${total}`}>
+      <ol className="progress" aria-label={`Pregunta ${currentIndex + 1} de ${total}`}>
         {questions.map((item, index) => (
           <li
             key={item.id}
@@ -213,11 +218,13 @@ export function EvaluationScreen({
       <main className="evaluation__stage">
         <aside className="evaluation__aside">
           <p className="evaluation__tagline">
-            <span>Pass or fail</span>
-            <span className="evaluation__tagline-dash" aria-hidden="true">
-              {'\u00a0—\u00a0'}
+            <span className="evaluation__tagline-line">
+              Pass or fail
+              <span className="evaluation__tagline-dash" aria-hidden="true">
+                {'\u00a0—'}
+              </span>
             </span>
-            <span>your call.</span>
+            <span className="evaluation__tagline-line">you choose.</span>
           </p>
 
           <SawCharacter
@@ -260,8 +267,8 @@ export function EvaluationScreen({
                 question={question}
                 index={currentIndex}
                 total={total}
-                awarded={awarded}
-                onAward={setAwarded}
+                points={points}
+                onPointsChange={setGroupPoints}
               />
             )}
           </AnimatePresence>
@@ -276,18 +283,18 @@ export function EvaluationScreen({
             >
               <span className="btn__label">
                 {stage === 'question'
-                  ? 'Finish question'
+                  ? 'Finalizar pregunta'
                   : stage === 'timesUp'
-                    ? 'Reveal answer'
+                    ? 'Ver respuesta'
                     : isLastQuestion
-                      ? 'See results'
-                      : 'Next question'}
+                      ? 'Ver resultados'
+                      : 'Siguiente pregunta'}
               </span>
               <span className="btn__glow" aria-hidden="true" />
             </motion.button>
 
             <p className="evaluation__shortcut">
-              Shortcuts: <kbd>→</kbd> continue · <kbd>P</kbd> pause · <kbd>M</kbd> sound
+              Atajos: <kbd>→</kbd> continuar · <kbd>P</kbd> pausa · <kbd>M</kbd> sonido
             </p>
           </div>
         </section>
@@ -301,9 +308,9 @@ export function EvaluationScreen({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <p>Evaluation paused</p>
+            <p>Evaluación en pausa</p>
             <button type="button" className="btn btn--ghost" onClick={() => setPaused(false)}>
-              <span className="btn__label">Resume</span>
+              <span className="btn__label">Reanudar</span>
             </button>
           </motion.div>
         )}

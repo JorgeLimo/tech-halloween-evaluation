@@ -5,7 +5,7 @@
 .result {
   align-items: center;
   justify-content: center;
-  padding: clamp(1.5rem, 4vw, 4rem);
+  padding: clamp(1rem, 3vw, 2.4rem);
   text-align: center;
 }
 
@@ -15,73 +15,109 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(1rem, 2.2vw, 1.7rem);
-  max-width: 820px;
+  gap: clamp(0.7rem, 1.6vw, 1.2rem);
+  max-width: 1000px;
 }
 
 .result__puppet {
-  width: clamp(170px, 22vw, 260px);
+  width: clamp(110px, 14vw, 200px);
 }
 
 .result__title {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 5.6vw, 4rem);
+  font-size: clamp(1.7rem, 4.4vw, 3.2rem);
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-shadow: 0 0 40px rgba(212, 27, 42, 0.45);
 }
 
-.result__score {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-  min-width: min(100%, 420px);
-  padding: clamp(1.2rem, 3vw, 2.2rem) clamp(1.6rem, 4vw, 3rem);
+.result__subtitle {
+  font-family: var(--font-mono);
+  font-size: clamp(0.8rem, 1.5vw, 1.05rem);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--blood-bright);
+}
+
+/* Tabla de los seis grupos ------------------------------------------------ */
+
+.result__table {
+  width: min(100%, 760px);
+  border-collapse: collapse;
   border: 1px solid var(--ink-600);
   border-radius: var(--radius-lg);
   background: rgba(10, 10, 16, 0.78);
-  --tone: var(--bone);
+  overflow: hidden;
 }
 
-.result__score--good {
-  --tone: #4fd17f;
-  border-color: rgba(79, 209, 127, 0.45);
-  box-shadow: inset 0 0 60px rgba(79, 209, 127, 0.12);
+.result__table th,
+.result__table td {
+  padding: clamp(0.35rem, 1vw, 0.7rem) clamp(0.7rem, 2vw, 1.6rem);
+  text-align: left;
 }
 
-.result__score--mid {
-  --tone: #f0b33c;
-  border-color: rgba(240, 179, 60, 0.45);
-  box-shadow: inset 0 0 60px rgba(240, 179, 60, 0.12);
-}
-
-.result__score--low {
-  --tone: var(--blood-bright);
-  border-color: rgba(212, 27, 42, 0.5);
-  box-shadow: inset 0 0 60px rgba(212, 27, 42, 0.14);
-}
-
-.result__score-label {
-  font-size: clamp(0.74rem, 1.3vw, 0.9rem);
-  letter-spacing: 0.3em;
+.result__table thead th {
+  font-family: var(--font-mono);
+  font-size: clamp(0.7rem, 1.2vw, 0.86rem);
+  font-weight: 400;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
   color: var(--ash);
+  border-bottom: 1px solid var(--ink-600);
 }
 
-.result__score-value {
+.result__table thead th:not(:first-child),
+.result__table tbody td {
+  text-align: right;
+}
+
+.result__row {
+  --tone: var(--bone);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.result__row--good {
+  --tone: #4fd17f;
+}
+
+.result__row--mid {
+  --tone: #f0b33c;
+}
+
+.result__row--low {
+  --tone: var(--blood-bright);
+}
+
+.result__row th {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone);
+  white-space: nowrap;
+}
+
+.result__points {
   font-family: var(--font-mono);
-  font-size: clamp(3.4rem, 11vw, 7rem);
-  line-height: 1;
+  font-size: clamp(1.3rem, 3vw, 2.2rem);
+  line-height: 1.1;
   color: var(--tone);
-  text-shadow: 0 0 40px color-mix(in srgb, var(--tone) 45%, transparent);
+  text-shadow: 0 0 26px color-mix(in srgb, var(--tone) 40%, transparent);
+  white-space: nowrap;
 }
 
-.result__score-max {
-  font-size: 0.42em;
+.result__points-max {
+  font-size: 0.55em;
   color: var(--ash);
   text-shadow: none;
+}
+
+.result__grade {
+  font-family: var(--font-mono);
+  font-size: clamp(1.1rem, 2.2vw, 1.7rem);
+  color: var(--bone-dim);
 }
 
 .result__formula {
@@ -95,4 +131,24 @@
   font-family: var(--font-body);
   font-size: clamp(0.95rem, 1.6vw, 1.15rem);
   color: var(--blood-bright);
+}
+
+/* En pantallas de poca altura la tabla es lo que debe verse completa. */
+@media (max-height: 860px) {
+  .result__content {
+    gap: 0.5rem;
+  }
+
+  .result__puppet {
+    width: clamp(90px, 10vw, 140px);
+  }
+
+  .result__title {
+    font-size: clamp(1.4rem, 3.2vw, 2.2rem);
+  }
+
+  .result__formula,
+  .result__note {
+    font-size: 0.9rem;
+  }
 }

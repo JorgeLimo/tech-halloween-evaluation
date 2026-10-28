@@ -2,10 +2,12 @@ import { motion } from 'framer-motion';
 import { Atmosphere } from './Atmosphere';
 import { SawCharacter } from './SawCharacter';
 import { usePuppet } from '../hooks/usePuppet';
+import type { GroupScore } from '../data/scores';
 import '../styles/result-screen.css';
 
 interface ResultScreenProps {
-  score: number;
+  /** Puntaje de cada grupo, en orden de grupo 1 a grupo 6. */
+  groupScores: GroupScore[];
   maxScore: number;
   totalQuestions: number;
   pointsPerQuestion: number;
@@ -13,8 +15,13 @@ interface ResultScreenProps {
   onRestart: () => void;
 }
 
+const row = {
+  hidden: { opacity: 0, x: -18 },
+  show: { opacity: 1, x: 0 },
+};
+
 export function ResultScreen({
-  score,
+  groupScores,
   maxScore,
   totalQuestions,
   pointsPerQuestion,
@@ -22,8 +29,11 @@ export function ResultScreen({
   onRestart,
 }: ResultScreenProps) {
   const { expression, direction } = usePuppet({ active: true, expressionInterval: 8_000 });
-  const ratio = maxScore > 0 ? score / maxScore : 0;
-  const tone = ratio >= 0.7 ? 'good' : ratio >= 0.5 ? 'mid' : 'low';
+
+  const tone = (total: number) => {
+    const ratio = maxScore > 0 ? total / maxScore : 0;
+    return ratio >= 0.7 ? 'good' : ratio >= 0.5 ? 'mid' : 'low';
+  };
 
   return (
     <div className="screen result">
@@ -39,29 +49,44 @@ export function ResultScreen({
           <SawCharacter expression={expression} direction={direction} mood="idle" size="lg" />
         </div>
 
-        <h1 className="result__title">Evaluation finished</h1>
+        <h1 className="result__title">Evaluación terminada</h1>
+        <p className="result__subtitle">Resultados finales</p>
 
-        <motion.div
-          className={`result__score result__score--${tone}`}
-          initial={{ scale: 0.86, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
+        <motion.table
+          className="result__table"
+          initial="hidden"
+          animate="show"
+          transition={{ staggerChildren: 0.09, delayChildren: 0.2 }}
         >
-          <span className="result__score-label">Score</span>
-          <p className="result__score-value">
-            {score} <span className="result__score-max">/ {maxScore}</span>
-          </p>
-        </motion.div>
+          <thead>
+            <tr>
+              <th scope="col">Grupo</th>
+              <th scope="col">Puntaje</th>
+              <th scope="col">Nota</th>
+            </tr>
+          </thead>
+          <tbody>
+            {groupScores.map((group) => (
+              <motion.tr key={group.groupId} variants={row} className={`result__row result__row--${tone(group.total)}`}>
+                <th scope="row">Grupo {group.groupId}</th>
+                <td className="result__points">
+                  {group.total} <span className="result__points-max">/ {maxScore}</span>
+                </td>
+                <td className="result__grade">{group.total}</td>
+              </motion.tr>
+            ))}
+          </tbody>
+        </motion.table>
 
         <p className="result__formula">
-          {totalQuestions} questions × {pointsPerQuestion} points = {maxScore} points
+          {totalQuestions} preguntas × {pointsPerQuestion} puntos = {maxScore} puntos por grupo
         </p>
 
         {expiredCount > 0 && (
           <p className="result__note">
             {expiredCount === 1
-              ? '1 question ran out of time.'
-              : `${expiredCount} questions ran out of time.`}
+              ? '1 pregunta se quedó sin tiempo.'
+              : `${expiredCount} preguntas se quedaron sin tiempo.`}
           </p>
         )}
 
@@ -72,7 +97,7 @@ export function ResultScreen({
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
         >
-          <span className="btn__label">Back to start</span>
+          <span className="btn__label">Volver al inicio</span>
         </motion.button>
       </motion.div>
     </div>
