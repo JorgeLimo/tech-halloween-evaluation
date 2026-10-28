@@ -47,13 +47,23 @@ Todas las preguntas están en un único archivo:
 export const questions: Question[] = [
   {
     id: 1,
-    points: 4,                         // puntos que vale la pregunta
-    text: '¿Qué dispositivo permite interconectar diferentes redes?',
-    correctAnswer: 'El router',        // visible solo al pulsar «Ver respuesta»
-    explanation: 'El router trabaja en la capa de red...',   // opcional
-    // category: 'Redes',              // opcional: etiqueta sobre el enunciado
-    // group: 1,                       // opcional: grupo que responde
-    // timeLimit: 240,                 // opcional: segundos solo para esta
+    points: 4,                          // puntos que vale la pregunta
+    category: 'Redes y cableado',       // opcional: etiqueta sobre el enunciado
+    title: 'Consultora «Andes Tech»',   // opcional: nombre del caso
+    text: 'La empresa alquila un piso con 40 PC…',   // situación planteada
+    // code: '-rwxr-x---  alumno1  docentes  practica.sh',  // opcional, literal
+    parts: [                            // opcional: incisos a), b), c)…
+      'El proveedor ofrece UTP Cat6. ¿El enlace de 115 m funcionará?',
+      'Para el enlace switch ↔ switch, ¿qué cable corresponde?',
+    ],
+    correctAnswer: 'No funciona a 115 m · cable cruzado',  // clave resumida
+    answers: [                          // clave inciso por inciso
+      'No: la longitud máxima del UTP es 100 m.',
+      'Cruzado (crossover): un extremo T568A y el otro T568B.',
+    ],
+    // explanation: 'Nota adicional…',  // opcional
+    // group: 1,                        // opcional: grupo que responde
+    // timeLimit: 240,                  // opcional: segundos solo para esta
   },
 ];
 ```
@@ -62,10 +72,15 @@ La aplicación se adapta automáticamente: numeración, barra de progreso,
 «Pregunta X de Y», puntaje máximo y pantalla de resultado. No hace falta tocar
 ningún componente.
 
+- Los incisos se etiquetan solos: a), b), c)… en el orden del arreglo `parts`,
+  y la clave (`answers`) se muestra con las mismas letras.
+- Si una pregunta no tiene `parts`, se muestra solo el enunciado; si no tiene
+  `answers`, se muestra `correctAnswer`.
 - Tiempo por defecto: `DEFAULT_TIME_LIMIT = 600` segundos (10 minutos).
 - `MAX_SCORE` se calcula solo, sumando los `points` de todas las preguntas.
-- Las preguntas incluidas son **ejemplos de Tecnología de Información**;
-  reemplácelas por las definitivas.
+- El panel del enunciado reparte la altura disponible: con un caso corto se
+  ajusta al contenido y con uno largo aprovecha toda la pantalla. Solo aparece
+  una barra de desplazamiento interna si la ventana es muy baja (≈768 px).
 
 ---
 

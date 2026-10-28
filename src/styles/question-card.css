@@ -4,9 +4,16 @@
 
 .question {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  min-height: 0;
   width: 100%;
-  max-width: 980px;
-  padding: clamp(1.4rem, 3vw, 2.8rem);
+  max-width: 1400px;
+  /* Techo de altura: deja sitio para la barra, el progreso y el botón, de modo
+     que la tarjeta nunca empuja «Finalizar pregunta» fuera de la pantalla. */
+  max-height: calc(100vh - 19rem);
+  padding: clamp(0.8rem, 1.4vw, 1.3rem) clamp(1.1rem, 2vw, 1.9rem);
   border: 1px solid var(--ink-600);
   border-radius: var(--radius-lg);
   background:
@@ -34,15 +41,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.8rem;
-  padding-bottom: clamp(0.9rem, 2vw, 1.4rem);
+  padding-bottom: clamp(0.5rem, 1.1vw, 0.8rem);
   border-bottom: 1px solid var(--ink-600);
 }
 
 .question__number {
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 2.8vw, 2.3rem);
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
   font-weight: 900;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--bone);
   text-shadow: 0 0 24px rgba(212, 27, 42, 0.35);
@@ -72,17 +79,87 @@
 }
 
 .question__body {
-  padding: clamp(1.2rem, 3vw, 2.2rem) 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: clamp(0.55rem, 1.2vw, 0.95rem);
+  padding: clamp(0.8rem, 1.7vw, 1.25rem) 0 clamp(0.6rem, 1.3vw, 0.95rem);
+  /* Si el caso es largo se desplaza la tarjeta, no la pantalla entera: el
+     contador, el personaje y el botón quedan siempre a la vista. El degradado
+     inferior y la barra fina avisan de que todavía hay texto debajo. */
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--blood-deep) transparent;
+  background:
+    linear-gradient(rgba(8, 8, 13, 0), rgba(8, 8, 13, 0.96)) bottom / 100% 2.6rem no-repeat local;
+}
+
+.question__body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.question__body::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--blood-deep);
+}
+
+.question__title {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--blood-bright);
 }
 
 .question__text {
   font-family: var(--font-body);
-  font-size: clamp(1.4rem, 2.5vw, 2.5rem);
-  line-height: 1.65;
+  font-size: clamp(0.95rem, 1.25vw, 1.2rem);
+  line-height: 1.46;
   color: var(--bone);
   /* Sangría de cita, como un enunciado de examen */
   padding-left: clamp(0.9rem, 2vw, 1.6rem);
   border-left: 3px solid var(--blood-deep);
+}
+
+/* Listado de salida de consola dentro del enunciado */
+.question__code {
+  padding: clamp(0.6rem, 1.4vw, 0.9rem) clamp(0.7rem, 1.6vw, 1.1rem);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: clamp(0.82rem, 1.15vw, 1.05rem);
+  line-height: 1.7;
+  white-space: pre;
+  color: #e7e3da;
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius-sm);
+  background: rgba(4, 4, 7, 0.9);
+}
+
+/* Incisos a), b), c)… */
+.question__parts {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.45rem, 0.95vw, 0.72rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.question__part {
+  display: flex;
+  gap: 0.6em;
+  font-family: var(--font-body);
+  font-size: clamp(0.92rem, 1.18vw, 1.14rem);
+  line-height: 1.45;
+  color: var(--bone-dim);
+}
+
+.question__part-label {
+  flex: none;
+  font-family: var(--font-mono);
+  color: var(--blood-bright);
 }
 
 .question__foot {
@@ -90,7 +167,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding-top: clamp(0.8rem, 1.6vw, 1.2rem);
+  padding-top: clamp(0.5rem, 1.1vw, 0.8rem);
   border-top: 1px solid var(--ink-600);
 }
 
@@ -106,4 +183,11 @@
   font-size: 0.9rem;
   color: var(--blood);
   opacity: 0.7;
+}
+
+/* Sin la línea de atajos, la tarjeta puede estirarse un poco más. */
+@media (max-height: 940px) {
+  .question {
+    max-height: calc(100vh - 16.5rem);
+  }
 }

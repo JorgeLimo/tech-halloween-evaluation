@@ -12,6 +12,9 @@ interface AnswerRevealProps {
   onPointsChange: (groupIndex: number, points: number) => void;
 }
 
+/** Etiqueta de cada inciso: a), b), c)… */
+const partLabel = (index: number) => `${String.fromCharCode(97 + index)})`;
+
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0 },
@@ -46,9 +49,20 @@ export function AnswerReveal({
         <h2 className="reveal__title">Respuesta correcta</h2>
       </motion.header>
 
-      <motion.p className="reveal__answer" variants={fadeUp}>
-        {question.correctAnswer}
-      </motion.p>
+      {question.answers ? (
+        <motion.ol className="reveal__answers" variants={fadeUp}>
+          {question.answers.map((answer, answerIndex) => (
+            <li className="reveal__answer-item" key={answer}>
+              <span className="reveal__answer-label">{partLabel(answerIndex)}</span>
+              <span>{answer}</span>
+            </li>
+          ))}
+        </motion.ol>
+      ) : (
+        <motion.p className="reveal__answer" variants={fadeUp}>
+          {question.correctAnswer}
+        </motion.p>
+      )}
 
       {question.explanation && (
         <motion.div className="reveal__why" variants={fadeUp}>

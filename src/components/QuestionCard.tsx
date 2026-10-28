@@ -8,6 +8,9 @@ interface QuestionCardProps {
   total: number;
 }
 
+/** Etiqueta de cada inciso: a), b), c)… */
+const partLabel = (index: number) => `${String.fromCharCode(97 + index)})`;
+
 export function QuestionCard({ question, index, total }: QuestionCardProps) {
   return (
     <AnimatePresence mode="wait">
@@ -35,7 +38,22 @@ export function QuestionCard({ question, index, total }: QuestionCardProps) {
         </header>
 
         <div className="question__body">
+          {question.title && <h2 className="question__title">{question.title}</h2>}
+
           <p className="question__text">{question.text}</p>
+
+          {question.code && <pre className="question__code">{question.code}</pre>}
+
+          {question.parts && (
+            <ol className="question__parts">
+              {question.parts.map((part, partIndex) => (
+                <li className="question__part" key={part}>
+                  <span className="question__part-label">{partLabel(partIndex)}</span>
+                  <span>{part}</span>
+                </li>
+              ))}
+            </ol>
+          )}
         </div>
 
         <footer className="question__foot">
