@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AnswerReveal } from './AnswerReveal';
 import { Atmosphere } from './Atmosphere';
+import { GameOver } from './GameOver';
 import { QuestionCard } from './QuestionCard';
 import { SawCharacter } from './SawCharacter';
 import { Timer } from './Timer';
 import { usePuppet } from '../hooks/usePuppet';
-import { getTimerPhase, useCountdown } from '../hooks/useCountdown';
+import { formatTime, getTimerPhase, useCountdown } from '../hooks/useCountdown';
 import { DEFAULT_TIME_LIMIT, type Question } from '../data/questions';
 import { isMuted, playSound, setMuted, stopAllSounds } from '../audio/sounds';
 import '../styles/evaluation.css';
@@ -24,8 +25,15 @@ interface EvaluationScreenProps {
   onAward: (index: number, points: number) => void;
 }
 
-/** Etapas por las que pasa cada pregunta. */
-type Stage = 'question' | 'reveal';
+/**
+ * Etapas por las que pasa cada pregunta:
+ *
+ *   question → time's up → reveal
+ *
+ * El paso de una a otra es siempre manual (o por el contador, que solo lleva
+ * a «time's up»): la respuesta nunca se revela sola.
+ */
+type Stage = 'question' | 'timesUp' | 'reveal';
 
 export function EvaluationScreen({
   questions,
@@ -52,9 +60,10 @@ export function EvaluationScreen({
     onLaugh: () => playSound('laugh'),
   });
 
+  /** El contador llegó a 00:00: se anuncia, pero no se revela nada. */
   const handleExpire = useCallback(() => {
     setTimedOut(true);
-    setStage('reveal');
+    setStage('timesUp');
     setExpression('threatening');
     stopAllSounds();
     playSound('gameover');
@@ -84,14 +93,26 @@ export function EvaluationScreen({
     setExpression('normal');
   }, [question.id, setExpression]);
 
-  /** Termina la pregunta antes de tiempo y pasa a la revisión. */
+  /** Cierra la pregunta antes de tiempo: detiene el contador y avisa. */
+  const finishQuestion = useCallback(() => {
+    stopAllSounds();
+    playSound('gameover');
+    setTimedOut(false);
+    setStage('timesUp');
+    setExpression('threatening');
+  }, [setExpression]);
+
+  /** Único camino hacia la respuesta: hay que pedirla. */
   const revealAnswer = useCallback(() => {
     stopAllSounds();
     playSound('next');
-    setTimedOut(false);
     setStage('reveal');
     setExpression('smile');
   }, [setExpression]);
+
+  /** Qué hace el botón principal en cada etapa. */
+  const primaryAction =
+    stage === 'question' ? finishQuestion : stage === 'timesUp' ? revealAnswer : undefined;
 
   /** Desde la revisión: guarda el puntaje y avanza. */
   const goNext = useCallback(() => {
@@ -122,7 +143,7 @@ export function EvaluationScreen({
 
       if (event.code === 'ArrowRight' || event.code === 'Space' || event.code === 'Enter') {
         event.preventDefault();
-        if (stage === 'question') revealAnswer();
+        if (primaryAction) primaryAction();
         else goNext();
         return;
       }
@@ -132,9 +153,10 @@ export function EvaluationScreen({
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [goNext, revealAnswer, stage, toggleMuted]);
+  }, [goNext, primaryAction, stage, toggleMuted]);
 
-  const alerted = stage === 'reveal' ? timedOut : phase === 'critical' || phase === 'final';
+  const alerted =
+    stage === 'question' ? phase === 'critical' || phase === 'final' : stage === 'timesUp';
 
   return (
     <div className={`screen evaluation evaluation--${stage === 'question' ? phase : 'review'}`}>
@@ -143,11 +165,11 @@ export function EvaluationScreen({
       <header className="evaluation__bar">
         <div className="evaluation__brand">
           <span className="evaluation__brand-mark" aria-hidden="true">✕</span>
-          <span className="evaluation__brand-text">Evaluación · Tecnología de Información</span>
+          <span className="evaluation__brand-text">Evaluation · Information Technology</span>
         </div>
 
         <p className="evaluation__position">
-          Pregunta <strong>{currentIndex + 1}</strong> de {total}
+          Question <strong>{currentIndex + 1}</strong> of {total}
         </p>
 
         <div className="evaluation__controls">
@@ -157,7 +179,7 @@ export function EvaluationScreen({
             onClick={() => setPaused((value) => !value)}
             disabled={stage !== 'question'}
             aria-pressed={paused}
-            title="Pausar / reanudar (P)"
+            title="Pause / resume (P)"
           >
             {paused ? '▶' : '❚❚'}
           </button>
@@ -166,14 +188,14 @@ export function EvaluationScreen({
             className="icon-btn"
             onClick={toggleMuted}
             aria-pressed={muted}
-            title="Silenciar / activar sonido (M)"
+            title="Mute / unmute (M)"
           >
             {muted ? '🔇' : '🔊'}
           </button>
         </div>
       </header>
 
-      <ol className="progress" aria-label={`Pregunta ${currentIndex + 1} de ${total}`}>
+      <ol className="progress" aria-label={`Question ${currentIndex + 1} of ${total}`}>
         {questions.map((item, index) => (
           <li
             key={item.id}
@@ -190,6 +212,14 @@ export function EvaluationScreen({
 
       <main className="evaluation__stage">
         <aside className="evaluation__aside">
+          <p className="evaluation__tagline">
+            <span>Pass or fail</span>
+            <span className="evaluation__tagline-dash" aria-hidden="true">
+              {'\u00a0—\u00a0'}
+            </span>
+            <span>your call.</span>
+          </p>
+
           <SawCharacter
             expression={expression}
             direction={direction}
@@ -206,20 +236,30 @@ export function EvaluationScreen({
 
         <section className="evaluation__main">
           <AnimatePresence mode="wait">
-            {stage === 'question' ? (
+            {stage === 'question' && (
               <QuestionCard
                 key={`q-${question.id}`}
                 question={question}
                 index={currentIndex}
                 total={total}
               />
-            ) : (
+            )}
+
+            {stage === 'timesUp' && (
+              <GameOver
+                key={`t-${question.id}`}
+                questionNumber={currentIndex + 1}
+                timedOut={timedOut}
+                clock={formatTime(timedOut ? 0 : remaining)}
+              />
+            )}
+
+            {stage === 'reveal' && (
               <AnswerReveal
                 key={`a-${question.id}`}
                 question={question}
                 index={currentIndex}
                 total={total}
-                timedOut={timedOut}
                 awarded={awarded}
                 onAward={setAwarded}
               />
@@ -230,22 +270,24 @@ export function EvaluationScreen({
             <motion.button
               type="button"
               className={`btn btn--lg ${stage === 'question' ? 'btn--primary' : 'btn--danger'}`}
-              onClick={stage === 'question' ? revealAnswer : goNext}
+              onClick={primaryAction ?? goNext}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
             >
               <span className="btn__label">
                 {stage === 'question'
-                  ? 'Ver respuesta'
-                  : isLastQuestion
-                    ? 'Ver resultado'
-                    : 'Siguiente pregunta'}
+                  ? 'Finish question'
+                  : stage === 'timesUp'
+                    ? 'Reveal answer'
+                    : isLastQuestion
+                      ? 'See results'
+                      : 'Next question'}
               </span>
               <span className="btn__glow" aria-hidden="true" />
             </motion.button>
 
             <p className="evaluation__shortcut">
-              Atajos: <kbd>→</kbd> continuar · <kbd>P</kbd> pausa · <kbd>M</kbd> sonido
+              Shortcuts: <kbd>→</kbd> continue · <kbd>P</kbd> pause · <kbd>M</kbd> sound
             </p>
           </div>
         </section>
@@ -259,9 +301,9 @@ export function EvaluationScreen({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <p>Evaluación en pausa</p>
+            <p>Evaluation paused</p>
             <button type="button" className="btn btn--ghost" onClick={() => setPaused(false)}>
-              <span className="btn__label">Reanudar</span>
+              <span className="btn__label">Resume</span>
             </button>
           </motion.div>
         )}

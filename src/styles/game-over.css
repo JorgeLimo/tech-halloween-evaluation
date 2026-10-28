@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Cartel de tiempo agotado (encabeza la revisión de la respuesta)
+   Pantalla de tiempo agotado (etapa previa a revelar la respuesta)
    ========================================================================== */
 
 .game-over {
@@ -45,4 +45,13 @@
   font-size: clamp(1rem, 1.7vw, 1.25rem);
   line-height: 1.5;
   color: var(--bone-dim);
+}
+
+.game-over__hint {
+  margin-top: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: clamp(0.7rem, 1.1vw, 0.86rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
 }

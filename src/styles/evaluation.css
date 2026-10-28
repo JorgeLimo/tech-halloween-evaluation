@@ -151,7 +151,36 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(0.8rem, 2vw, 1.6rem);
+  gap: clamp(0.5rem, 1.4vw, 1.05rem);
+}
+
+/* Frase que el personaje le dedica al estudiante */
+.evaluation__tagline {
+  max-width: 17ch;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(0.74rem, 1.05vw, 0.95rem);
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: 0.22em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.75);
+}
+
+/* En pantallas anchas cabe en una sola línea, que es como mejor se lee. */
+@media (min-width: 1100px) {
+  .evaluation__tagline {
+    max-width: none;
+    white-space: nowrap;
+  }
+}
+
+.evaluation__tagline-dash {
+  margin: 0 0.18em;
+  color: var(--blood-bright);
+  text-shadow: 0 0 16px rgba(255, 47, 63, 0.75);
 }
 
 .evaluation__main {
@@ -299,5 +328,17 @@
 
   .timer__ring {
     width: 170px;
+  }
+}
+
+/* En pantallas de poca altura se ajustan solo los espacios, para que el
+   contador siga visible sin desplazar la página. */
+@media (max-height: 960px) {
+  .evaluation__stage {
+    padding-top: 0;
+  }
+
+  .progress {
+    margin-top: 0.25rem;
   }
 }

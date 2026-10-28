@@ -2,9 +2,9 @@
 
 Aplicación web para tomar una evaluación a **6 grupos de estudiantes** de
 forma simultánea, con estética oscura inspirada en el cine de terror: una
-pregunta a la vez, un contador de **5 minutos**, la respuesta correcta con su
-explicación al terminar cada pregunta, y un muñeco animado que observa, gira
-la cabeza y cambia de expresión.
+pregunta a la vez, un contador de **10 minutos**, la respuesta correcta con su
+explicación —que solo aparece cuando se pide— y un muñeco animado que observa,
+gira la cabeza y cambia de expresión.
 
 **5 preguntas × 4 puntos = 20 puntos.**
 
@@ -48,7 +48,7 @@ export const questions: Question[] = [
     id: 1,
     points: 4,                         // puntos que vale la pregunta
     text: '¿Qué dispositivo permite interconectar diferentes redes?',
-    correctAnswer: 'El router',        // se revela al terminar el tiempo
+    correctAnswer: 'El router',        // visible solo al pulsar «Reveal answer»
     explanation: 'El router trabaja en la capa de red...',   // opcional
     // category: 'Redes',              // opcional: etiqueta sobre el enunciado
     // group: 1,                       // opcional: grupo que responde
@@ -61,7 +61,7 @@ La aplicación se adapta automáticamente: numeración, barra de progreso,
 «Pregunta X de Y», puntaje máximo y pantalla de resultado. No hace falta tocar
 ningún componente.
 
-- Tiempo por defecto: `DEFAULT_TIME_LIMIT = 300` segundos (5 minutos).
+- Tiempo por defecto: `DEFAULT_TIME_LIMIT = 600` segundos (10 minutos).
 - `MAX_SCORE` se calcula solo, sumando los `points` de todas las preguntas.
 - Las preguntas incluidas son **ejemplos de Tecnología de Información**;
   reemplácelas por las definitivas.
@@ -71,37 +71,41 @@ ningún componente.
 ## Flujo
 
 ```
-INICIO → PREGUNTA 1 (05:00) → VER RESPUESTA (o 00:00)
+START → QUESTION 01 (10:00) → FINISH QUESTION (o 00:00)
                                       ↓
-                        RESPUESTA CORRECTA + ¿POR QUÉ?
+                                 TIME'S UP!
                                       ↓
-                             SIGUIENTE PREGUNTA
+                             [ REVEAL ANSWER ]
+                                      ↓
+                        CORRECT ANSWER + EXPLANATION
+                                      ↓
+                            [ NEXT QUESTION ]
                                       ↓
                                    ... × 5
                                       ↓
-                                VER RESULTADO
+                             [ SEE RESULTS ]
                                       ↓
-                    EVALUACIÓN TERMINADA — XX / 20
+                      EVALUATION FINISHED — XX / 20
 ```
 
-- El contador **solo arranca** al presionar «Iniciar evaluación».
-- Se reinicia a `05:00` en cada pregunta nueva, junto con los estados de alerta.
+- El contador **solo arranca** al presionar «Start evaluation».
+- Se reinicia a `10:00` en cada pregunta nueva, junto con los estados de alerta.
 - Estados del contador: normal (> 2 min) → advertencia (2–1 min) → crítico
   (< 1 min) → alerta intensa con parpadeo (últimos 10 s).
-- La pregunta termina de dos maneras: al pulsar **«Ver respuesta»** o cuando el
-  contador llega a `00:00`. En ambos casos el contador se detiene y aparece la
-  revisión con la respuesta correcta y su explicación.
-- Si se acabó el tiempo, la revisión aparece encabezada por el cartel
-  **GAME OVER**; ya no bloquea la evaluación, solo ambienta.
-- Desde la revisión, **«Siguiente pregunta»** (o **«Ver resultado»** en la
-  última) es el único botón que avanza.
+- La pregunta termina de dos maneras: al pulsar **«Finish question»** o cuando
+  el contador llega a `00:00`. En ambos casos el contador se detiene y aparece
+  la pantalla **TIME'S UP!**, que **no revela nada**.
+- La respuesta correcta y la explicación aparecen únicamente al pulsar
+  **«Reveal answer»**: nunca de forma automática.
+- Desde la revisión, **«Next question»** (o **«See results»** en la última) es
+  el único botón que avanza.
 - No se puede volver a una pregunta anterior (el estado es un índice simple en
   `App.tsx`, así que agregar un botón «Anterior» es trivial si se necesita).
 
 ### Puntaje
 
-En la pantalla de revisión hay dos botones, **Correcta · +4** e
-**Incorrecta · 0**, para que quien dirige la evaluación califique la respuesta
+En la pantalla de revisión hay dos botones, **Correct · +4** y
+**Wrong · 0**, para que quien dirige la evaluación califique la respuesta
 del grupo. Lo marcado se suma y se muestra al final como `XX / 20`. Si no se
 marca nada, la pregunta cuenta 0.
 

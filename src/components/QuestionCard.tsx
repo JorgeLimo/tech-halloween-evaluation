@@ -21,13 +21,13 @@ export function QuestionCard({ question, index, total }: QuestionCardProps) {
       >
         <header className="question__head">
           <span className="question__number">
-            Pregunta {String(index + 1).padStart(2, '0')}
+            Question {String(index + 1).padStart(2, '0')}
           </span>
 
           <div className="question__tags">
             {question.group !== undefined && (
               <span className="question__tag question__tag--group">
-                Grupo {String(question.group).padStart(2, '0')}
+                Group {String(question.group).padStart(2, '0')}
               </span>
             )}
             {question.category && <span className="question__tag">{question.category}</span>}
@@ -40,7 +40,7 @@ export function QuestionCard({ question, index, total }: QuestionCardProps) {
 
         <footer className="question__foot">
           <span className="question__counter">
-            Pregunta {index + 1} de {total}
+            Question {index + 1} of {total}
           </span>
           <span className="question__sigil">✕</span>
         </footer>

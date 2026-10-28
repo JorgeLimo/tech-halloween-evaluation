@@ -37,7 +37,7 @@ export function StartScreen({
         transition={{ staggerChildren: 0.14, delayChildren: 0.1 }}
       >
         <motion.p className="start__eyebrow" variants={fadeUp}>
-          Tecnología de Información · Halloween {new Date().getFullYear()}
+          Information Technology · Halloween {new Date().getFullYear()}
         </motion.p>
 
         <motion.div className="start__puppet" variants={fadeUp}>
@@ -45,27 +45,27 @@ export function StartScreen({
         </motion.div>
 
         <motion.h1 className="start__title" variants={fadeUp}>
-          <span className="start__title-line">Quiero jugar</span>
-          <span className="start__title-strong">un juego</span>
+          <span className="start__title-line">Wanna play</span>
+          <span className="start__title-strong">a game?</span>
         </motion.h1>
 
         <motion.p className="start__subtitle" variants={fadeUp}>
-          {totalQuestions} preguntas · {maxScore} puntos · {TOTAL_GROUPS} grupos
+          {totalQuestions} questions · {maxScore} points · {TOTAL_GROUPS} groups
         </motion.p>
 
         <motion.div className="start__rules" variants={fadeUp}>
           <p className="start__rule">
-            Cada pregunta tiene un tiempo máximo de
-            <strong> {minutesPerQuestion} minutos</strong> y vale{' '}
-            <strong>{Math.round(maxScore / totalQuestions)} puntos</strong>.
+            Each question has a maximum time of
+            <strong> {minutesPerQuestion} minutes</strong> and is worth{' '}
+            <strong>{Math.round(maxScore / totalQuestions)} points</strong>.
           </p>
           <p className="start__rule start__rule--muted">
-            Cuando el contador llegue a <span className="start__mono">00:00</span> se revelará la
-            respuesta correcta y su explicación. No hay vuelta atrás.
+            When the timer reaches <span className="start__mono">00:00</span>, time is up. The
+            answer will not be revealed until you choose to reveal it.
           </p>
           <p className="start__rule start__rule--muted">
-            {totalQuestions} preguntas × {Math.round(maxScore / totalQuestions)} puntos ={' '}
-            <strong>{maxScore} puntos</strong>.
+            {totalQuestions} questions × {Math.round(maxScore / totalQuestions)} points ={' '}
+            <strong>{maxScore} points</strong>.
           </p>
         </motion.div>
 
@@ -77,12 +77,12 @@ export function StartScreen({
           whileHover={{ scale: 1.035 }}
           whileTap={{ scale: 0.97 }}
         >
-          <span className="btn__label">Iniciar evaluación</span>
+          <span className="btn__label">Start evaluation</span>
           <span className="btn__glow" aria-hidden="true" />
         </motion.button>
 
         <motion.p className="start__hint" variants={fadeUp}>
-          El contador comienza únicamente al presionar este botón.
+          The timer starts only when you press this button.
         </motion.p>
       </motion.div>
     </div>

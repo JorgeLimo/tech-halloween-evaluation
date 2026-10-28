@@ -39,7 +39,7 @@ export function ResultScreen({
           <SawCharacter expression={expression} direction={direction} mood="idle" size="lg" />
         </div>
 
-        <h1 className="result__title">Evaluación terminada</h1>
+        <h1 className="result__title">Evaluation finished</h1>
 
         <motion.div
           className={`result__score result__score--${tone}`}
@@ -47,21 +47,21 @@ export function ResultScreen({
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
         >
-          <span className="result__score-label">Puntaje</span>
+          <span className="result__score-label">Score</span>
           <p className="result__score-value">
             {score} <span className="result__score-max">/ {maxScore}</span>
           </p>
         </motion.div>
 
         <p className="result__formula">
-          {totalQuestions} preguntas × {pointsPerQuestion} puntos = {maxScore} puntos
+          {totalQuestions} questions × {pointsPerQuestion} points = {maxScore} points
         </p>
 
         {expiredCount > 0 && (
           <p className="result__note">
             {expiredCount === 1
-              ? '1 pregunta se quedó sin tiempo.'
-              : `${expiredCount} preguntas se quedaron sin tiempo.`}
+              ? '1 question ran out of time.'
+              : `${expiredCount} questions ran out of time.`}
           </p>
         )}
 
@@ -72,7 +72,7 @@ export function ResultScreen({
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
         >
-          <span className="btn__label">Volver al inicio</span>
+          <span className="btn__label">Back to start</span>
         </motion.button>
       </motion.div>
     </div>

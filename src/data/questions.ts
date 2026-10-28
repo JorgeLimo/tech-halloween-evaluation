@@ -9,12 +9,12 @@
  *  - id            : identificador único (además reinicia el contador).
  *  - text          : enunciado de la pregunta.
  *  - points        : puntos que vale la pregunta.
- *  - correctAnswer : respuesta correcta que se muestra al terminar el tiempo.
+ *  - correctAnswer : respuesta correcta, visible solo al pulsar «Reveal answer».
  *  - explanation   : (opcional) por qué esa es la respuesta correcta.
  *  - group         : (opcional) grupo al que le corresponde responder.
  *  - category      : (opcional) etiqueta temática sobre el enunciado.
  *  - timeLimit     : (opcional) segundos solo para esta pregunta.
- *                    Si se omite se usan 300 (5 minutos).
+ *                    Si se omite se usan 600 (10 minutos).
  */
 
 export interface Question {
@@ -28,8 +28,8 @@ export interface Question {
   timeLimit?: number;
 }
 
-/** Tiempo por defecto para cada pregunta: 5 minutos. */
-export const DEFAULT_TIME_LIMIT = 300;
+/** Tiempo por defecto para cada pregunta: 10 minutos. */
+export const DEFAULT_TIME_LIMIT = 600;
 
 /** Cantidad de grupos que participan en la evaluación. */
 export const TOTAL_GROUPS = 6;

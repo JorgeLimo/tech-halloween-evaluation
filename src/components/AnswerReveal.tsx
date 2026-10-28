@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { GameOver } from './GameOver';
 import type { Question } from '../data/questions';
 import '../styles/answer-reveal.css';
 
@@ -7,8 +6,6 @@ interface AnswerRevealProps {
   question: Question;
   index: number;
   total: number;
-  /** `true` cuando la pregunta terminó porque el contador llegó a 00:00. */
-  timedOut: boolean;
   /** Puntos otorgados hasta ahora, o `null` si aún no se calificó. */
   awarded: number | null;
   onAward: (points: number) => void;
@@ -22,15 +19,13 @@ const fadeUp = {
 /**
  * Revisión de la pregunta: respuesta correcta y explicación.
  *
- * Sustituye a la tarjeta del enunciado una vez terminado el tiempo (o cuando
- * se pulsa «Ver respuesta»), manteniendo al personaje y el resto del
- * escenario a la vista.
+ * Solo se muestra cuando se pulsa «Reveal answer» en la pantalla de tiempo
+ * agotado, nunca de forma automática.
  */
 export function AnswerReveal({
   question,
   index,
   total,
-  timedOut,
   awarded,
   onAward,
 }: AnswerRevealProps) {
@@ -41,14 +36,12 @@ export function AnswerReveal({
       animate="show"
       transition={{ staggerChildren: 0.1 }}
     >
-      {timedOut && <GameOver questionNumber={index + 1} />}
-
       <motion.header className="reveal__head" variants={fadeUp}>
         <span className="reveal__eyebrow">
-          Pregunta {String(index + 1).padStart(2, '0')} de {String(total).padStart(2, '0')} ·{' '}
-          {question.points} puntos
+          Question {String(index + 1).padStart(2, '0')} of {String(total).padStart(2, '0')} ·{' '}
+          {question.points} points
         </span>
-        <h2 className="reveal__title">Respuesta correcta</h2>
+        <h2 className="reveal__title">Correct answer</h2>
       </motion.header>
 
       <motion.p className="reveal__answer" variants={fadeUp}>
@@ -57,13 +50,13 @@ export function AnswerReveal({
 
       {question.explanation && (
         <motion.div className="reveal__why" variants={fadeUp}>
-          <h3 className="reveal__why-title">¿Por qué?</h3>
+          <h3 className="reveal__why-title">Explanation</h3>
           <p className="reveal__why-text">{question.explanation}</p>
         </motion.div>
       )}
 
       <motion.div className="reveal__score" variants={fadeUp}>
-        <span className="reveal__score-label">Calificación del grupo</span>
+        <span className="reveal__score-label">Group score</span>
         <div className="reveal__score-actions">
           <button
             type="button"
@@ -71,7 +64,7 @@ export function AnswerReveal({
             onClick={() => onAward(question.points)}
             aria-pressed={awarded === question.points}
           >
-            Correcta · +{question.points}
+            Correct · +{question.points}
           </button>
           <button
             type="button"
@@ -79,7 +72,7 @@ export function AnswerReveal({
             onClick={() => onAward(0)}
             aria-pressed={awarded === 0}
           >
-            Incorrecta · 0
+            Wrong · 0
           </button>
         </div>
       </motion.div>
