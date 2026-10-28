@@ -1,0 +1,82 @@
+/* ==========================================================================
+   Contador
+   ========================================================================== */
+
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  --timer-color: var(--bone);
+  --timer-aura: rgba(236, 230, 216, 0.22);
+}
+
+.timer--warning {
+  --timer-color: #f0b33c;
+  --timer-aura: rgba(240, 179, 60, 0.35);
+}
+
+.timer--critical {
+  --timer-color: var(--blood-bright);
+  --timer-aura: rgba(255, 47, 63, 0.45);
+}
+
+.timer--final {
+  --timer-color: #ff5563;
+  --timer-aura: rgba(255, 47, 63, 0.7);
+}
+
+.timer__ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(clamp(170px, 18vw, 260px), 26vh);
+  aspect-ratio: 1;
+}
+
+.timer__ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.timer__track {
+  fill: rgba(8, 8, 13, 0.72);
+  stroke: var(--ink-600);
+  stroke-width: 7;
+}
+
+.timer__progress {
+  fill: none;
+  stroke: var(--timer-color);
+  stroke-width: 7;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 12px var(--timer-aura));
+  transition: stroke 0.6s ease;
+}
+
+.timer__value {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: clamp(3rem, 5.4vw, 5rem);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--timer-color);
+  text-shadow: 0 0 26px var(--timer-aura);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.6s ease;
+}
+
+.timer__label {
+  font-size: clamp(0.72rem, 1.2vw, 0.88rem);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ash);
+  text-align: center;
+}
+
+.timer--critical .timer__label,
+.timer--final .timer__label {
+  color: var(--blood-bright);
+}

@@ -1,0 +1,186 @@
+/* ==========================================================================
+   Capas ambientales: humo, luces rojas, polvo, viñeta y grano
+   ========================================================================== */
+
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Luces rojas difusas ----------------------------------------------------- */
+
+.atmosphere__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  mix-blend-mode: screen;
+}
+
+.atmosphere__glow--one {
+  top: -22vh;
+  left: -10vw;
+  width: 62vw;
+  height: 62vw;
+  background: radial-gradient(circle, rgba(167, 18, 30, 0.42), transparent 68%);
+  animation: glow-drift 22s ease-in-out infinite alternate;
+}
+
+.atmosphere__glow--two {
+  right: -16vw;
+  bottom: -26vh;
+  width: 70vw;
+  height: 70vw;
+  background: radial-gradient(circle, rgba(94, 10, 18, 0.46), transparent 70%);
+  animation: glow-drift 28s ease-in-out infinite alternate-reverse;
+}
+
+.atmosphere--calm .atmosphere__glow {
+  opacity: 0.65;
+}
+
+.atmosphere--alert .atmosphere__glow--one {
+  background: radial-gradient(circle, rgba(226, 26, 42, 0.6), transparent 66%);
+  animation: glow-pulse 1.8s ease-in-out infinite;
+}
+
+.atmosphere--alert .atmosphere__glow--two {
+  background: radial-gradient(circle, rgba(160, 14, 26, 0.6), transparent 68%);
+  animation: glow-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes glow-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(6vw, 4vh, 0) scale(1.18);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
+
+/* Humo -------------------------------------------------------------------- */
+
+.atmosphere__smoke {
+  position: absolute;
+  inset: -20% -40%;
+  background-repeat: repeat;
+  opacity: 0.4;
+  mix-blend-mode: screen;
+}
+
+.atmosphere__smoke--back {
+  background-image:
+    radial-gradient(ellipse 48% 32% at 20% 70%, rgba(90, 92, 104, 0.3), transparent 70%),
+    radial-gradient(ellipse 40% 26% at 72% 82%, rgba(70, 72, 84, 0.28), transparent 72%),
+    radial-gradient(ellipse 52% 30% at 46% 94%, rgba(110, 112, 124, 0.22), transparent 70%);
+  animation: smoke-slide 70s linear infinite;
+}
+
+.atmosphere__smoke--front {
+  inset: auto -40% -18%;
+  height: 58vh;
+  background-image:
+    radial-gradient(ellipse 36% 46% at 12% 100%, rgba(124, 126, 138, 0.3), transparent 70%),
+    radial-gradient(ellipse 30% 40% at 52% 100%, rgba(96, 98, 110, 0.26), transparent 72%),
+    radial-gradient(ellipse 34% 44% at 88% 100%, rgba(112, 114, 126, 0.24), transparent 70%);
+  filter: blur(14px);
+  animation: smoke-slide 48s linear infinite reverse;
+}
+
+@keyframes smoke-slide {
+  from {
+    transform: translate3d(-8%, 0, 0);
+  }
+  to {
+    transform: translate3d(8%, -4%, 0);
+  }
+}
+
+/* Polvo flotante ---------------------------------------------------------- */
+
+.atmosphere__dust {
+  position: absolute;
+  inset: 0;
+}
+
+.atmosphere__mote {
+  position: absolute;
+  bottom: -6vh;
+  border-radius: 50%;
+  background: rgba(236, 230, 216, 0.85);
+  box-shadow: 0 0 6px rgba(236, 230, 216, 0.5);
+  animation-name: mote-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes mote-rise {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(var(--drift, 0px), -112vh, 0);
+  }
+}
+
+/* Viñeta, grano y líneas de barrido -------------------------------------- */
+
+.atmosphere__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(130% 100% at 50% 40%, transparent 32%, rgba(0, 0, 0, 0.55) 72%, rgba(0, 0, 0, 0.92) 100%);
+}
+
+.atmosphere__grain {
+  position: absolute;
+  inset: -50%;
+  opacity: 0.16;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 0.9s steps(4) infinite;
+}
+
+@keyframes grain-shift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(-2%, 1%, 0);
+  }
+  50% {
+    transform: translate3d(1%, -2%, 0);
+  }
+  75% {
+    transform: translate3d(2%, 2%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.atmosphere__scanlines {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.22) 3px,
+    rgba(0, 0, 0, 0) 4px
+  );
+}

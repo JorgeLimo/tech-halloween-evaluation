@@ -1,0 +1,109 @@
+/* ==========================================================================
+   Tarjeta de pregunta
+   ========================================================================== */
+
+.question {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  padding: clamp(1.4rem, 3vw, 2.8rem);
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgba(18, 18, 26, 0.94), rgba(8, 8, 13, 0.96));
+  box-shadow:
+    var(--shadow-deep),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Filo rojo superior */
+.question::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 12%;
+  right: 12%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--blood), transparent);
+  box-shadow: 0 0 18px rgba(212, 27, 42, 0.7);
+}
+
+.question__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding-bottom: clamp(0.9rem, 2vw, 1.4rem);
+  border-bottom: 1px solid var(--ink-600);
+}
+
+.question__number {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.8vw, 2.3rem);
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--bone);
+  text-shadow: 0 0 24px rgba(212, 27, 42, 0.35);
+}
+
+.question__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.question__tag {
+  padding: 0.35em 0.85em;
+  font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ash);
+  border: 1px solid var(--ink-600);
+  border-radius: 999px;
+  background: rgba(10, 10, 16, 0.8);
+}
+
+.question__tag--group {
+  color: #ffd9dd;
+  border-color: rgba(212, 27, 42, 0.5);
+  background: rgba(70, 8, 14, 0.55);
+}
+
+.question__body {
+  padding: clamp(1.2rem, 3vw, 2.2rem) 0;
+}
+
+.question__text {
+  font-family: var(--font-body);
+  font-size: clamp(1.4rem, 2.5vw, 2.5rem);
+  line-height: 1.65;
+  color: var(--bone);
+  /* Sangría de cita, como un enunciado de examen */
+  padding-left: clamp(0.9rem, 2vw, 1.6rem);
+  border-left: 3px solid var(--blood-deep);
+}
+
+.question__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: clamp(0.8rem, 1.6vw, 1.2rem);
+  border-top: 1px solid var(--ink-600);
+}
+
+.question__counter {
+  font-family: var(--font-mono);
+  font-size: clamp(0.82rem, 1.4vw, 1rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+
+.question__sigil {
+  font-size: 0.9rem;
+  color: var(--blood);
+  opacity: 0.7;
+}

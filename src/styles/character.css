@@ -1,0 +1,87 @@
+/* ==========================================================================
+   Personaje (muñeco)
+   ========================================================================== */
+
+.character {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  isolation: isolate;
+}
+
+/* El dibujo tiene proporción 320 × 560 (alto = 1.75 × ancho). */
+.character--sm {
+  max-width: 112px;
+}
+
+.character--md {
+  max-width: min(clamp(190px, 26vw, 380px), 30vh);
+}
+
+.character--lg {
+  max-width: min(clamp(158px, 20vw, 250px), 34vh);
+}
+
+.character__body {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  filter: drop-shadow(0 24px 30px rgba(0, 0, 0, 0.8));
+}
+
+.puppet {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Halo de luz detrás de la cabeza */
+.character__halo {
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  width: 96%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(188, 20, 32, 0.32), transparent 65%);
+  filter: blur(28px);
+  animation: halo-breathe 6s ease-in-out infinite;
+}
+
+.character--idle .character__halo {
+  background: radial-gradient(circle, rgba(150, 16, 28, 0.3), transparent 68%);
+}
+
+.character--alert .character__halo {
+  background: radial-gradient(circle, rgba(255, 47, 63, 0.5), transparent 64%);
+  animation-duration: 1.4s;
+}
+
+@keyframes halo-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* Variante con imágenes propias */
+.character__image-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+
+.character__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
